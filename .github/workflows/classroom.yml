@@ -1,0 +1,56 @@
+name: Autograding Tests
+'on':
+- push
+- repository_dispatch
+permissions:
+  checks: write
+  actions: read
+  contents: read
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Caso 1
+      id: caso-1
+      uses: classroom-resources/autograding-io-grader@v1
+      with:
+        test-name: Caso 1
+        setup-command: ''
+        command: python calcula_media.py
+        input: "-2 -1 0 1 2"
+        expected-output: '0.0'
+        comparison-method: contains
+        timeout: 5
+    - name: Caso 2
+      id: caso-2
+      uses: classroom-resources/autograding-io-grader@v1
+      with:
+        test-name: Caso 2
+        setup-command: ''
+        command: python calcula_media.py
+        input: 10 -10 20 -20 0
+        expected-output: '0.0'
+        comparison-method: contains
+        timeout: 5
+    - name: Caso 3
+      id: caso-3
+      uses: classroom-resources/autograding-io-grader@v1
+      with:
+        test-name: Caso 3
+        setup-command: ''
+        command: python calcula_media.py
+        input: 4 4 4 4 4
+        expected-output: '4.0'
+        comparison-method: contains
+        timeout: 5
+    - name: Autograding Reporter
+      uses: classroom-resources/autograding-grading-reporter@v1
+      env:
+        CASO-1_RESULTS: "${{steps.caso-1.outputs.result}}"
+        CASO-2_RESULTS: "${{steps.caso-2.outputs.result}}"
+        CASO-3_RESULTS: "${{steps.caso-3.outputs.result}}"
+      with:
+        runners: caso-1,caso-2,caso-3
